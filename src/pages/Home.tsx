@@ -1,14 +1,40 @@
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'motion/react';
+import { motion, useScroll, useTransform } from 'motion/react';
 import { ArrowRight, Trophy, Users, Zap } from 'lucide-react';
 import Button from '../components/Button';
 import PlanCard from '../components/PlanCard';
 import TrainerCard from '../components/TrainerCard';
 import SectionHeading from '../components/SectionHeading';
 import CountUp from '../components/CountUp';
+import { TrainerSkeleton } from '../components/Skeleton';
 import { plans, trainers, testimonials } from '../data/mockData';
 
 export default function Home() {
+  const [loadingTrainers, setLoadingTrainers] = useState(true);
+  
+  // Parallax refs
+  const heroRef = useRef(null);
+  const trainersSectionRef = useRef(null);
+
+  const { scrollYProgress: heroScroll } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"]
+  });
+
+  const { scrollYProgress: trainersScroll } = useScroll({
+    target: trainersSectionRef,
+    offset: ["start end", "end start"]
+  });
+
+  const heroY = useTransform(heroScroll, [0, 1], ["0%", "30%"]);
+  const trainersY = useTransform(trainersScroll, [0, 1], ["-15%", "15%"]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoadingTrainers(false), 1500);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <main className="pt-20">
       {/* Decorative Background Text */}
@@ -17,8 +43,8 @@ export default function Home() {
       </div>
 
       {/* Hero Section */}
-      <section id="hero" className="relative h-[95vh] min-h-[700px] flex items-center overflow-hidden">
-        <div className="absolute inset-0 z-0">
+      <section id="hero" ref={heroRef} className="relative h-[95vh] min-h-[700px] flex items-center overflow-hidden">
+        <motion.div style={{ y: heroY }} className="absolute inset-0 z-0 scale-110">
           <img
             src="https://images.unsplash.com/photo-1540497077202-7c8a3999166f?q=80&w=2070"
             alt="Gym Hero"
@@ -27,7 +53,7 @@ export default function Home() {
           />
           <div className="absolute inset-0 bg-gradient-to-r from-dark via-dark/50 to-transparent"></div>
           <div className="noise absolute inset-0 opacity-20"></div>
-        </div>
+        </motion.div>
 
         <div className="max-w-7xl mx-auto px-6 relative z-10 w-full">
           <motion.div
@@ -121,7 +147,18 @@ export default function Home() {
       </section>
 
       {/* Trainers Section */}
-      <section id="trainers" className="py-32 bg-surface relative overflow-hidden">
+      <section id="trainers" ref={trainersSectionRef} className="py-32 bg-surface relative overflow-hidden">
+        <motion.div 
+          style={{ y: trainersY }}
+          className="absolute inset-0 z-0 opacity-20 scale-125"
+        >
+          <img 
+            src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070" 
+            alt="Trainers Background" 
+            className="w-full h-full object-cover grayscale"
+            referrerPolicy="no-referrer"
+          />
+        </motion.div>
         <div className="noise absolute inset-0 opacity-10"></div>
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="flex flex-col md:row items-end justify-between mb-16">
@@ -135,9 +172,12 @@ export default function Home() {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {trainers.map((trainer) => (
-              <TrainerCard key={trainer.id} trainer={trainer} />
-            ))}
+            {loadingTrainers 
+              ? Array(3).fill(0).map((_, i) => <TrainerSkeleton key={i} />)
+              : trainers.map((trainer) => (
+                <TrainerCard key={trainer.id} trainer={trainer} />
+              ))
+            }
           </div>
         </div>
       </section>

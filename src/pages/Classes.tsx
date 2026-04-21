@@ -1,11 +1,18 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import SectionHeading from '../components/SectionHeading';
 import ClassCard from '../components/ClassCard';
+import { ClassSkeleton } from '../components/Skeleton';
 import { classes } from '../data/mockData';
 
 export default function Classes() {
   const [activeTab, setActiveTab] = useState('All');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 1200);
+    return () => clearTimeout(timer);
+  }, []);
 
   const filteredClasses = activeTab === 'All' 
     ? classes 
@@ -39,18 +46,30 @@ export default function Classes() {
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
         >
            <AnimatePresence mode="popLayout">
-            {filteredClasses.map((item) => (
-              <motion.div
-                key={item.id}
-                layout
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.3 }}
-              >
-                <ClassCard item={item} />
-              </motion.div>
-            ))}
+            {loading 
+              ? Array(6).fill(0).map((_, i) => (
+                  <motion.div 
+                    key={`skeleton-${i}`}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    <ClassSkeleton />
+                  </motion.div>
+                ))
+              : filteredClasses.map((item) => (
+                  <motion.div
+                    key={item.id}
+                    layout
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <ClassCard item={item} />
+                  </motion.div>
+                ))
+            }
            </AnimatePresence>
         </motion.div>
 

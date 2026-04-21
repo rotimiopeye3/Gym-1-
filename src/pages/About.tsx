@@ -1,9 +1,18 @@
-import { motion } from 'motion/react';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import SectionHeading from '../components/SectionHeading';
 import TrainerCard from '../components/TrainerCard';
+import { TrainerSkeleton } from '../components/Skeleton';
 import { trainers } from '../data/mockData';
 
 export default function About() {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 1500);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <main className="pt-32 pb-20">
       <div className="max-w-7xl mx-auto px-6 font-display">
@@ -48,7 +57,7 @@ export default function About() {
               <img 
                 src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070" 
                 alt="Gym Interior" 
-                className="grayscale hover:grayscale-0 transition-all duration-500 border border-white/10"
+                className="grayscale hover:grayscale-0 transition-all duration-500 border border-white/10 w-full"
                 referrerPolicy="no-referrer"
               />
               <div className="absolute bg-primary p-12 -bottom-10 -right-10 hidden md:block border border-black/20">
@@ -64,10 +73,31 @@ export default function About() {
           title="Meet Our Masters"
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-           {trainers.map((trainer) => (
-             <TrainerCard key={trainer.id} trainer={trainer} />
-           ))}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 min-h-[450px]">
+           <AnimatePresence mode="popLayout">
+            {loading 
+              ? Array(3).fill(0).map((_, i) => (
+                  <motion.div 
+                    key={`skeleton-${i}`} 
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    <TrainerSkeleton />
+                  </motion.div>
+                ))
+              : trainers.map((trainer) => (
+                  <motion.div
+                    key={trainer.id}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.4 }}
+                  >
+                    <TrainerCard trainer={trainer} />
+                  </motion.div>
+                ))
+            }
+           </AnimatePresence>
         </div>
       </div>
     </main>
