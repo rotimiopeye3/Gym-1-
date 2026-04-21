@@ -1,9 +1,11 @@
+import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { ArrowRight, Trophy, Users, Zap } from 'lucide-react';
 import Button from '../components/Button';
 import PlanCard from '../components/PlanCard';
 import TrainerCard from '../components/TrainerCard';
 import SectionHeading from '../components/SectionHeading';
+import CountUp from '../components/CountUp';
 import { plans, trainers, testimonials } from '../data/mockData';
 
 export default function Home() {
@@ -15,7 +17,7 @@ export default function Home() {
       </div>
 
       {/* Hero Section */}
-      <section className="relative h-[95vh] min-h-[700px] flex items-center overflow-hidden">
+      <section id="hero" className="relative h-[95vh] min-h-[700px] flex items-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img
             src="https://images.unsplash.com/photo-1540497077202-7c8a3999166f?q=80&w=2070"
@@ -55,12 +57,16 @@ export default function Home() {
               <Button size="lg" className="min-w-[240px]">Join The Elite</Button>
               <div className="flex items-center gap-8 pl-4">
                  <div className="flex flex-col">
-                    <span className="text-3xl font-black">12k+</span>
+                    <span className="text-3xl font-black">
+                      <CountUp to={12} suffix="k+" />
+                    </span>
                     <span className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Members</span>
                  </div>
                  <div className="w-[1px] h-10 bg-white/10"></div>
                  <div className="flex flex-col">
-                    <span className="text-3xl font-black">45+</span>
+                    <span className="text-3xl font-black">
+                      <CountUp to={45} suffix="+" />
+                    </span>
                     <span className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Trainers</span>
                  </div>
               </div>
@@ -74,10 +80,10 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {[
-              { icon: Zap, label: 'High Intensity', value: '150+' },
-              { icon: Users, label: 'World Class Trainers', value: '25+' },
-              { icon: Trophy, label: 'Success Stories', value: '1k+' },
-              { icon: Zap, label: 'Fitness Equipment', value: '200+' },
+              { icon: Zap, label: 'High Intensity', value: 150, suffix: '+' },
+              { icon: Users, label: 'World Class Trainers', value: 25, suffix: '+' },
+              { icon: Trophy, label: 'Success Stories', value: 1000, suffix: '+' },
+              { icon: Zap, label: 'Fitness Equipment', value: 200, suffix: '+' },
             ].map((stat, i) => (
               <motion.div
                 key={i}
@@ -88,7 +94,9 @@ export default function Home() {
                 className="text-center group"
               >
                 <stat.icon className="mx-auto text-primary mb-4 group-hover:scale-110 transition-transform" size={32} />
-                <h3 className="text-3xl font-black italic mb-1 uppercase tracking-tight">{stat.value}</h3>
+                <h3 className="text-3xl font-black italic mb-1 uppercase tracking-tight">
+                  <CountUp to={stat.value} suffix={stat.suffix} />
+                </h3>
                 <p className="text-muted text-[10px] uppercase tracking-widest font-bold">{stat.label}</p>
               </motion.div>
             ))}
@@ -97,7 +105,7 @@ export default function Home() {
       </section>
 
       {/* Membership Section */}
-      <section className="py-32 relative">
+      <section id="pricing" className="py-32 relative">
         <div className="max-w-7xl mx-auto px-6">
           <SectionHeading
             centered
@@ -113,7 +121,7 @@ export default function Home() {
       </section>
 
       {/* Trainers Section */}
-      <section className="py-32 bg-surface relative overflow-hidden">
+      <section id="trainers" className="py-32 bg-surface relative overflow-hidden">
         <div className="noise absolute inset-0 opacity-10"></div>
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="flex flex-col md:row items-end justify-between mb-16">
@@ -191,5 +199,3 @@ export default function Home() {
     </main>
   );
 }
-
-import { Link } from 'react-router-dom';

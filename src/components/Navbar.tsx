@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Dumbbell } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -18,11 +18,23 @@ export default function Navbar() {
   }, []);
 
   const navLinks = [
-    { name: 'Home', path: '/' },
+    { name: 'Home', path: '/', hash: '#hero' },
     { name: 'About', path: '/about' },
     { name: 'Classes', path: '/classes' },
+    { name: 'Pricing', path: '/', hash: '#pricing' },
     { name: 'Contact', path: '/contact' },
   ];
+
+  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, link: { path: string; hash?: string }) => {
+    if (link.hash && location.pathname === link.path) {
+      e.preventDefault();
+      const element = document.querySelector(link.hash);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+        setIsOpen(false);
+      }
+    }
+  };
 
   return (
     <nav
@@ -35,7 +47,7 @@ export default function Navbar() {
           <div className="w-8 h-8 bg-primary rounded-sm transform -skew-x-12 flex items-center justify-center">
             <Dumbbell size={18} className="text-black transform skew-x-12" />
           </div>
-          <span className="text-2xl font-black tracking-tighter uppercase italic">
+          <span className="text-2xl font-black tracking-tighter uppercase italic text-white">
             IronPulse
           </span>
         </Link>
@@ -45,15 +57,18 @@ export default function Navbar() {
           {navLinks.map((link) => (
             <Link
               key={link.name}
-              to={link.path}
+              to={link.hash ? `${link.path}${link.hash}` : link.path}
+              onClick={(e) => handleLinkClick(e, link)}
               className={`text-[10px] font-bold uppercase tracking-[0.2em] hover:text-primary transition-colors ${
-                location.pathname === link.path ? 'text-primary' : 'text-gray-400'
+                location.pathname === link.path && (!link.hash || location.hash === link.hash) 
+                  ? 'text-primary' 
+                  : 'text-gray-400'
               }`}
             >
               {link.name}
             </Link>
           ))}
-          <Button variant="primary" size="sm">
+          <Button variant="primary" size="sm" onClick={() => window.location.href = '#pricing'}>
             Join Now
           </Button>
         </div>
@@ -68,22 +83,28 @@ export default function Navbar() {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
             className="absolute top-0 left-0 w-full h-screen bg-dark flex flex-col items-center justify-center gap-8 md:hidden z-[-1]"
           >
             {navLinks.map((link) => (
               <Link
                 key={link.name}
-                to={link.path}
-                onClick={() => setIsOpen(false)}
-                className="text-4xl font-display uppercase font-black hover:text-primary transition-colors"
+                to={link.hash ? `${link.path}${link.hash}` : link.path}
+                onClick={(e) => {
+                  handleLinkClick(e, link);
+                  setIsOpen(false);
+                }}
+                className="text-4xl font-black uppercase italic hover:text-primary transition-colors"
               >
                 {link.name}
               </Link>
             ))}
-            <Button variant="primary" size="lg" onClick={() => setIsOpen(false)}>
+            <Button variant="primary" size="lg" onClick={() => {
+              window.location.href = '#pricing';
+              setIsOpen(false);
+            }}>
               Join Now
             </Button>
           </motion.div>
